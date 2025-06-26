@@ -16,9 +16,14 @@ const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-// Posição da câmera
-camera.position.z = 5;
+// Grade de referência no chão
+const gridHelper = new THREE.GridHelper(30, 30);
+scene.add(gridHelper);
 
-// Inicializa controles de teclado e animação
-Keys.move(); // Começa a escutar teclas
+// Eixos de referência
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
+
+// Iniciar controle de teclas e animação
+Keys.listen(); // Começa a escutar teclas
 Keys.animate(cube, renderer, scene, camera); // Inicia o loop de animação
