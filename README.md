@@ -1,6 +1,6 @@
 # Projeto da Equipe de Estudos Avançados
 
-Este repositório faz parte das atividades da Equipe de Estudos Avançados. Ele utiliza a biblioteca [Three.js](https://threejs.org/) para gráficos 3D e o bundler [Vite](https://vitejs.dev/) para desenvolvimento rápido de aplicações web modernas.
+Este repositório faz parte das atividades da Equipe de Estudos Avançados. Ele utiliza a biblioteca [Three.js](https://threejs.org/) para gráficos 3D e o bundler [Vite](https://vitejs.dev/) para desenvolvimento de um Gêmeo Digital. 
 
 ---
 
