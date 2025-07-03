@@ -1,6 +1,10 @@
 import * as THREE from 'ws://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js';
 
-const client = mqtt.connect('http://mqtt.ect.ufrn.br:1883'); // Mosquitto público via WebSocket
+    const client = mqtt.connect('ws://mqtt.ect.ufrn.br', {
+      clientId: 'testeMQTT',
+      username: 'mqtt',
+      password: 'lar_mqtt'
+    });
 
 client.on('connect', () => {
   console.log('✅ Conectado ao Mosquitto');
