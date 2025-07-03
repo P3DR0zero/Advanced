@@ -1,16 +1,31 @@
-# Projeto da Equipe de Estudos Avançados
+# 🚀 Projeto Gêmeo Digital — Equipe de Estudos Avançados
 
-Este repositório faz parte das atividades da Equipe de Estudos Avançados. Ele utiliza a biblioteca [Three.js](https://threejs.org/) para gráficos 3D e o bundler [Vite](https://vitejs.dev/) para desenvolvimento de um Gêmeo Digital. 
+Este projeto faz parte das atividades da **Equipe de Estudos Avançados**, com o objetivo de criar um **Gêmeo Digital 3D** utilizando:
+
+- [**Three.js**](https://threejs.org/) para renderizações gráficas 3D em tempo real.
+- [**Vite**](https://vitejs.dev/) como bundler moderno para desenvolvimento rápido e eficiente.
 
 ---
 
-##  Instalação
+## 💡 O que é um Gêmeo Digital?
 
-**Antes de começar, certifique-se de ter o [Node.js](https://nodejs.org/) instalado.**
+Um **Gêmeo Digital** é uma representação virtual de um objeto, ambiente ou sistema real. Ele permite simulações, monitoramentos e análises que auxiliam no entendimento e otimização do mundo físico.
 
-### 1. Instale as dependências obrigatórias:
-*Faça o clone do repositorio mas não use ele para testar provavelmente vai dar problema, instale tudo em outra pasta e use os arquivos Keys.js e main.js no seu codigo tudo diferente disso deve ser baixado em sua maquina*
+---
+
+## ⚙️ Como Instalar e Executar
+
+> ⚠️ **ATENÇÃO:** NÃO execute diretamente o projeto clonado deste repositório.  
+> Ele é apenas **referencial**. Para rodar corretamente, **crie um novo projeto do zero** e **utilize apenas os arquivos `Keys.js` e `main.js`** contidos aqui.
+
+---
+
+### ✅ Etapas de Instalação
+
+1. **Instale o [Node.js](https://nodejs.org/)**, se ainda não estiver instalado.
+
+2. **Crie uma nova pasta para o projeto e acesse-a pelo terminal:**
+
 ```bash
-npm install --save three
-npm install --save-dev vite
-npx vite  OBS ESSE É PARA QUANDO TUDO ESTIVER PRONTO E VOCÊ FOR TESTAR O CODIGO
+mkdir gemeo-digital
+cd gemeo-digital
