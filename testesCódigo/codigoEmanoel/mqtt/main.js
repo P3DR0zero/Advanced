@@ -1,4 +1,4 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js';
+import * as THREE from 'ws://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js';
 
 const client = mqtt.connect('http://mqtt.ect.ufrn.br:1883'); // Mosquitto público via WebSocket
 
