@@ -1,6 +1,10 @@
 import * as THREE from 'three';
+import { comunica } from './comunica.js';
+comunica.connect();
 
-export class Keys {
+export class Keys  {
+  
+
   static pressed = {}; // Teclas pressionadas
 
   static listen() {

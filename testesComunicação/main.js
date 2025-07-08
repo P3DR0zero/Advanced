@@ -42,6 +42,7 @@ loader.load(
     // Iniciar controles e animação com o modelo
     Keys.listen();
     Keys.animate(model, renderer, scene, camera);
+    
   },
   undefined,
   function (error) {
