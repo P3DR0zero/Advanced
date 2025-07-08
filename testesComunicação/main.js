@@ -1,74 +1,49 @@
 import * as THREE from 'three';
-import mqtt from 'mqtt';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Keys } from './keys.js';
 
-// Configuração da cena
+// Cena, câmera e renderizador
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+
 const camera = new THREE.PerspectiveCamera(
   75, window.innerWidth / window.innerHeight, 0.1, 1000
 );
-const renderer = new THREE.WebGLRenderer();
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Cubo (personagem)
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshNormalMaterial();
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// Luz
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(0, 1, 1).normalize();
+scene.add(light);
 
-// Grade e eixos
-scene.add(new THREE.GridHelper(30, 30));
-scene.add(new THREE.AxesHelper(5));
+// Grade de referência no chão
+const gridHelper = new THREE.GridHelper(30, 30);
+scene.add(gridHelper);
 
-// Posição da câmera atrás do cubo
-camera.position.set(0, 3, 6);
-camera.lookAt(cube.position);
+// Eixos de referência
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
 
-// Rotação alvo (do sensor) e rotação atual (no cubo) no eixo Y
-let targetY = 0;
-let currentY = 0;
+// Carregar modelo GLB no lugar do cubo
+const loader = new GLTFLoader();
+loader.load(
+  'modelo/carro2.glb',
+  function (gltf) {
+    const model = gltf.scene;
+    model.scale.set(0.03, 0.03, 0.03);
+    model.position.set(0, 0, 0);
+    scene.add(model);
 
-// Conecta ao broker MQTT
-const client = mqtt.connect("ws://mqtt.ect.ufrn.br:1884/mqtt", {
-  username: "mqtt",
-  password: "lar_mqtt",
-  clientId: "CodigoNossoQueEstasEmC",
-  clean: true,
-});
-
-client.on("connect", () => {
-  console.log("✅ Conectado ao MQTT");
-  client.subscribe("R/IOT/CTRL");
-});
-
-client.on("message", (topic, message) => {
-  try {
-    const data = JSON.parse(message.toString());
-    const toRad = deg => deg * Math.PI / 180;
-    targetY = toRad(parseFloat(data.z) || 0);
-  } catch (err) {
-    console.error("Erro ao processar MQTT:", err);
+    // Iniciar controles e animação com o modelo
+    Keys.listen();
+    Keys.animate(model, renderer, scene, camera);
+  },
+  undefined,
+  function (error) {
+    console.error('Erro ao carregar o modelo:', error);
   }
-});
-
-// Loop de animação com suavização
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Suaviza a rotação (efeito mola)
-  const lerpFactor = 0.1;
-  currentY += (targetY - currentY) * lerpFactor;
-  cube.rotation.y = currentY;
-
-  // Atualiza a câmera para olhar onde o cubo aponta
-  const cameraOffset = new THREE.Vector3(0, 3, 6);
-  const rotatedOffset = cameraOffset.clone().applyAxisAngle(
-    new THREE.Vector3(0, 1, 0), currentY
-  );
-  camera.position.copy(cube.position.clone().add(rotatedOffset));
-  camera.lookAt(cube.position);
-
-  renderer.render(scene, camera);
-}
-
-animate();
+);
