@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Keys } from './keys.js';
+import mqtt from 'mqtt';
 
 // Cena, câmera e renderizador
 const scene = new THREE.Scene();
