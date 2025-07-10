@@ -20,6 +20,7 @@ const client = mqtt.connect("ws://mqtt.ect.ufrn.br:1884/mqtt", {
       const data = JSON.parse(message.toString());
       const toRad = deg => deg * Math.PI / 180;
       targetY = toRad(parseFloat(data.z) || 0);
+      console.log('📦 Recebido:', data);
     } catch (err) {
       console.error("Erro ao processar MQTT:", err);
     }
