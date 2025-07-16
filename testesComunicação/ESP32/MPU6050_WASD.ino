@@ -26,9 +26,16 @@ unsigned long tempo_anterior = 0;
 const long intervalo = 200;
 
 // Eixos e controle
-float eixo_x, eixo_y, eixo_z,giro_x,giro_y,giro_z;
+float eixo_x, eixo_y, eixo_z, giro_x, giro_y, giro_z;
+float ponto_referencia = 0; // Ponto de referência que será atualizado
+const float limiar_movimento = 15.0; // 15 graus para ativar movimento
 String ultimaTecla = "";
 String ultimoEstado = "";
+
+// Variáveis para controle de estado
+bool aguardando_release = false;
+unsigned long tempo_press = 0;
+const unsigned long delay_release = 500; // 500ms antes do release automático
 
 // Wi-Fi
 void setup_wifi() {
@@ -65,52 +72,78 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
+
+  // Calibração inicial
+  mpu6050.update();
+  ponto_referencia = mpu6050.getAngleZ();
+  Serial.print("Ponto de referência inicial: ");
+  Serial.println(ponto_referencia);
+}
+
+void enviarTecla(String tecla, String acao) {
+  String json = "{\n  \"key\": \"" + tecla + "\",\n  \"action\": \"" + acao + "\"\n}";
+  client.publish("R/IOT/CTRL", json.c_str());
+  Serial.println(json);
+}
+
+void atualizarPontoReferencia(float novo_ponto) {
+  ponto_referencia = novo_ponto;
+  Serial.print("Novo ponto de referência: ");
+  Serial.println(ponto_referencia);
 }
 
 void loop() {
   if (!client.connected()) reconnect();
   client.loop();
 
-
-  // Evitar uso de delay através do mano millis
+  // Evitar uso de delay através do millis
   tempo_atual = millis();
   if (tempo_atual - tempo_anterior >= intervalo) {
     tempo_anterior = tempo_atual;
 
     // Leitura do sensor
     mpu6050.update();
-    giro_x = mpu6050.getGyroAngleX();
-    giro_y = mpu6050.getGyroAngleY();
-    giro_z = mpu6050.getGyroAngleZ();
     eixo_z = mpu6050.getAngleZ();
-    eixo_y = mpu6050.getAngleX();
-    eixo_x = mpu6050.getAngleY();
-
+    
+    // Calcula a diferença em relação ao ponto de referência
+    float diferenca = eixo_z - ponto_referencia;
+    
     String teclaAtual = "";
-
-    // Define direção com base nos ângulos
-    /*if (eixo_y < -15) teclaAtual = "w";
-    else if (eixo_y > 15) teclaAtual = "s";
-    else if (eixo_x < -15) teclaAtual = "a";
-    else if (eixo_x > 15) teclaAtual = "d";*/
-
-    if (giro_z < -15) teclaAtual = "a";
-    else if (giro_z > 15) teclaAtual = "d";
-
-    // Envio de JSON apenas se mudar o estado
-    if (teclaAtual != "" && (teclaAtual != ultimaTecla || ultimoEstado != "pressed")) {
-      String json = "{\n  \"key\": \"" + teclaAtual + "\",\n  \"action\": \"pressed\"\n}";
-      client.publish("R/IOT/CTRL", json.c_str());
-      Serial.println(json);
-
+    
+    // Verifica se houve movimento significativo
+    if (diferenca <= -limiar_movimento) {
+      teclaAtual = "a"; // Movimento para a esquerda
+    } else if (diferenca >= limiar_movimento) {
+      teclaAtual = "d"; // Movimento para a direita
+    }
+    
+    // Lógica de envio de teclas
+    if (teclaAtual != "" && !aguardando_release) {
+      // Envia tecla pressionada
+      enviarTecla(teclaAtual, "pressed");
       ultimaTecla = teclaAtual;
       ultimoEstado = "pressed";
-    } else if (teclaAtual == "" && ultimoEstado == "pressed") {
-      String json = "{\n  \"key\": \"" + ultimaTecla + "\",\n  \"action\": \"release\"\n}";
-      client.publish("R/IOT/CTRL", json.c_str());
-      Serial.println(json);
-
+      aguardando_release = true;
+      tempo_press = tempo_atual;
+      
+    } else if (aguardando_release && (tempo_atual - tempo_press >= delay_release)) {
+      // Envia release após o delay
+      enviarTecla(ultimaTecla, "release");
       ultimoEstado = "release";
+      aguardando_release = false;
+      
+      // Atualiza o ponto de referência para a posição atual
+      atualizarPontoReferencia(eixo_z);
     }
+    
+    // Debug - mostra valores atuais
+    Serial.print("Eixo Z: ");
+    Serial.print(eixo_z);
+    Serial.print(" | Referência: ");
+    Serial.print(ponto_referencia);
+    Serial.print(" | Diferença: ");
+    Serial.print(diferenca);
+    Serial.print(" | Aguardando release: ");
+    Serial.println(aguardando_release ? "SIM" : "NÃO");
   }
 }
