@@ -5,8 +5,8 @@
 #include <MPU6050_tockn.h>
 
 // Wi-Fi e MQTT
-const char* ssid = "brisa-1758139";
-const char* password = "tsl2lrf6";
+const char* ssid = "Hel's_doces";
+const char* password = "helsdoces123";
 const char* mqtt_server = "mqtt.ect.ufrn.br";
 const int mqtt_port = 1883;
 const char* mqtt_user = "mqtt";
@@ -26,7 +26,7 @@ unsigned long tempo_anterior = 0;
 const long intervalo = 200;
 
 // Eixos e controle
-float eixo_x, eixo_y, eixo_z;
+float eixo_x, eixo_y, eixo_z,giro_x,giro_y,giro_z;
 String ultimaTecla = "";
 String ultimoEstado = "";
 
@@ -79,6 +79,9 @@ void loop() {
 
     // Leitura do sensor
     mpu6050.update();
+    giro_x = mpu6050.getGyroAngleX();
+    giro_y = mpu6050.getGyroAngleY();
+    giro_z = mpu6050.getGyroAngleZ();
     eixo_z = mpu6050.getAngleZ();
     eixo_y = mpu6050.getAngleX();
     eixo_x = mpu6050.getAngleY();
@@ -86,10 +89,13 @@ void loop() {
     String teclaAtual = "";
 
     // Define direção com base nos ângulos
-    if (eixo_y < -15) teclaAtual = "w";
+    /*if (eixo_y < -15) teclaAtual = "w";
     else if (eixo_y > 15) teclaAtual = "s";
     else if (eixo_x < -15) teclaAtual = "a";
-    else if (eixo_x > 15) teclaAtual = "d";
+    else if (eixo_x > 15) teclaAtual = "d";*/
+
+    if (giro_z < -15) teclaAtual = "a";
+    else if (giro_z > 15) teclaAtual = "d";
 
     // Envio de JSON apenas se mudar o estado
     if (teclaAtual != "" && (teclaAtual != ultimaTecla || ultimoEstado != "pressed")) {
